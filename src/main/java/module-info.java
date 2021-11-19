@@ -1,6 +1,7 @@
 module me.reszkojr.workshopjavafxjdbc {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.graphics;
 
 
     opens me.reszkojr.workshopjavafxjdbc to javafx.fxml;
