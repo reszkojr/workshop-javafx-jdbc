@@ -36,8 +36,7 @@ public class MainViewController implements Initializable {
 
     @FXML
     public void onMenuItemDepartmentAction() {
-        //loadView("absoluteName");
-        System.out.println("onMenuItemDepartmentAction");
+        loadView("gui/DepartmentList.fxml");
     }
 
     @FXML
@@ -65,6 +64,7 @@ public class MainViewController implements Initializable {
             mainVBox.getChildren().add(mainMenu);
             mainVBox.getChildren().addAll(newVBox.getChildren());
         } catch (IOException e) {
+            e.printStackTrace();
             Alerts.showAlert("IOException", "Error loading view", e.getMessage(), Alert.AlertType.ERROR);
         }
     }
