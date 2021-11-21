@@ -15,6 +15,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import me.reszkojr.workshopjavafxjdbc.Main;
+import me.reszkojr.workshopjavafxjdbc.model.services.DepartmentService;
 import utils.Alerts;
 
 public class MainViewController implements Initializable {
@@ -36,7 +37,8 @@ public class MainViewController implements Initializable {
 
     @FXML
     public void onMenuItemDepartmentAction() {
-        loadView("gui/DepartmentList.fxml");
+        loadView2("gui/DepartmentList.fxml");
+
     }
 
     @FXML
@@ -63,6 +65,31 @@ public class MainViewController implements Initializable {
             mainVBox.getChildren().clear();
             mainVBox.getChildren().add(mainMenu);
             mainVBox.getChildren().addAll(newVBox.getChildren());
+        } catch (IOException e) {
+            e.printStackTrace();
+            Alerts.showAlert("IOException", "Error loading view", e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private synchronized void loadView2(String absoluteName) {
+        try {
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource(absoluteName));
+            VBox newVBox = loader.load();
+
+            Scene mainScene = Main.getMainScene();
+
+            // Gets the content of the mainScene variable, so we can substitute it with another content that we want
+            VBox mainVBox = ((VBox) ((ScrollPane) mainScene.getRoot()).getContent());
+
+            // Gets the first children of the mainVBox
+            Node mainMenu = mainVBox.getChildren().get(0);
+            mainVBox.getChildren().clear();
+            mainVBox.getChildren().add(mainMenu);
+            mainVBox.getChildren().addAll(newVBox.getChildren());
+
+            DepartmentListController controller = loader.getController();
+            controller.setDepartmentService(new DepartmentService());
+            controller.updateTableView();
         } catch (IOException e) {
             e.printStackTrace();
             Alerts.showAlert("IOException", "Error loading view", e.getMessage(), Alert.AlertType.ERROR);
