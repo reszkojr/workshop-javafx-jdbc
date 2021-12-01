@@ -15,6 +15,13 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.27</version>
+        </dependency>
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -60,7 +67,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>me.reszkojr.workshopjavafxjdbc/me.reszkojr.workshopjavafxjdbc.HelloApplication
+                            <mainClass>me.reszkojr.workshopjavafxjdbc/me.reszkojr.workshopjavafxjdbc.Main
                             </mainClass>
                         </configuration>
                     </execution>

@@ -33,7 +33,6 @@ public class MainViewController implements Initializable {
 
     @FXML
     public void onMenuItemSellerAction() {
-        //loadView("absoluteName");
         System.out.println("onMenuItemSellerAction");
     }
 
@@ -57,12 +56,12 @@ public class MainViewController implements Initializable {
 
     private synchronized <T> void loadView(String absoluteName, Consumer<T> initializingAction) {
         try {
-            FXMLLoader loader = new FXMLLoader(Main.class.getResource(absoluteName));
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource(absoluteName)); // Loads an FXML file from the absoluteName argument.
             VBox newVBox = loader.load();
 
             Scene mainScene = Main.getMainScene();
 
-            // Gets the content of the mainScene variable, so we can substitute it with another content that we want
+            // Gets the content of the mainScene variable, so we can replace it with another content that we want.
             VBox mainVBox = ((VBox) ((ScrollPane) mainScene.getRoot()).getContent());
 
             // Gets the first children of the mainVBox
@@ -71,8 +70,8 @@ public class MainViewController implements Initializable {
             mainVBox.getChildren().add(mainMenu);
             mainVBox.getChildren().addAll(newVBox.getChildren());
 
-            T controller = loader.getController();
-            initializingAction.accept(controller);
+            T controller = loader.getController(); // Gets the controller from the loaded FXML file.
+            initializingAction.accept(controller); // Executes the accept method using the lambda expression passed on the argument.
 
         } catch (IOException e) {
             e.printStackTrace();

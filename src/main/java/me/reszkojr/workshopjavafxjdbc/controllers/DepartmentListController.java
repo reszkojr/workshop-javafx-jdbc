@@ -1,6 +1,7 @@
 package me.reszkojr.workshopjavafxjdbc.controllers;
 
 import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -8,10 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
@@ -39,6 +37,9 @@ public class DepartmentListController implements Initializable, DataChangeListen
     private TableColumn<Department, Integer> tableColumnId;
 
     @FXML
+    private TableColumn<Department, Department> tableColumnEDIT;
+
+    @FXML
     private TableColumn<Department, String> tableColumnName;
 
     @FXML
@@ -48,6 +49,8 @@ public class DepartmentListController implements Initializable, DataChangeListen
 
     @FXML
     public void onBtNewAction(ActionEvent event) {
+
+        // In case the button is pressed, it will instantiate a dialog form passing the current stage as a parent for the dialog form
         Stage parentStage = Utils.currentStage(event);
         Department obj = new Department();
         createDialogForm(obj, "gui/DepartmentForm.fxml", parentStage);
@@ -63,6 +66,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
         tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         Stage stage = (Stage) Main.getMainScene().getWindow();
+        // Makes the tableViewDepartment the same height as the main scene
         tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
     }
 
@@ -78,30 +82,66 @@ public class DepartmentListController implements Initializable, DataChangeListen
         List<Department> list = service.findAll();
         obsList = FXCollections.observableArrayList(list);
         tableViewDepartment.setItems(obsList);
+        initEditButtons();
     }
 
+    // Creates a dialog form from the arguments
     private void createDialogForm(Department obj, String absoluteName, Stage parentStage) {
         try {
+            // Loads an FXML from absoluteName string
             FXMLLoader loader = new FXMLLoader(Main.class.getResource(absoluteName));
             Pane pane = loader.load();
 
+            // Gets the DepartmentFormController from the loader
             DepartmentFormController controller = loader.getController();
-            controller.setDepartment(obj);
+            controller.setDepartment(obj);  // Injects the dependency into it
             controller.updateFormData();
-            controller.subscribeDataChangeListener(this);
+            controller.subscribeDataChangeListener(this); // Subscribes itself to receive a notification when the DepartmentFormController updates the database
             controller.setDepartmentService(new DepartmentService());
 
+            // Creates a dialog stage, where it will be the stage whose gonna receive the updates from the database
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Enter Department data:");
             dialogStage.setScene(new Scene(pane));
             dialogStage.setResizable(false);
             dialogStage.initOwner(parentStage);
-            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initModality(Modality.WINDOW_MODAL); // Makes the window modal, turning the main window unfocusable.
             dialogStage.showAndWait();
 
         } catch (IOException e) {
             Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), Alert.AlertType.ERROR);
         }
+    }
+
+    // Method that initiate the "Edit" buttons inside the "Edit" column.
+    private void initEditButtons() {
+
+        // Creates a CellValueFactory that is read-only.
+        tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+
+        // Instantiate a CellFactory with modified atributes
+        tableColumnEDIT.setCellFactory(param -> new TableCell<Department, Department>() {
+
+            // Creates the "Edit" button
+            private final Button button = new Button("Edit");
+
+            // Overrides the updateItem method to not update the items if the object is null
+            @Override
+            protected void updateItem(Department obj, boolean empty) {
+                super.updateItem(obj, empty);
+
+                if (obj == null) {
+                    setGraphic(null);
+                    return;
+                }
+                // Sets the button into the column
+                setGraphic(button);
+
+                // If pressed, the button will open the dialog form with the object in the row
+                button.setOnAction(event -> createDialogForm(obj, "gui/DepartmentForm.fxml", Utils.currentStage(event)));
+            }
+
+        });
     }
 
     @Override

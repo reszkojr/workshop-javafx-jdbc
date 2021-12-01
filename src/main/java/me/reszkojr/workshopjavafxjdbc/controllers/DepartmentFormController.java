@@ -49,11 +49,12 @@ public class DepartmentFormController implements Initializable {
         if (service == null) {
             throw new IllegalStateException("Service is null");
         }
+
         try {
-            entity = getFormData();
-            service.saveOrUpdate(entity);
-            notifyDataChangeListeners();
-            Utils.currentStage(event).close();
+            entity = getFormData(); // Gets the data that was written inside the form.
+            service.saveOrUpdate(entity); // Saves the data inside the service and insert it into the database.
+            notifyDataChangeListeners(); // Notifies all the DataChangeListeners to update the TableView.
+            Utils.currentStage(event).close(); // Closes the currentStage, exiting the form.
         } catch (DbException e) {
             Alerts.showAlert("Error saving object", null, e.getMessage(), Alert.AlertType.ERROR);
         } catch (ValidationException e) {
@@ -86,17 +87,18 @@ public class DepartmentFormController implements Initializable {
     }
 
     public void subscribeDataChangeListener(DataChangeListener listener) {
+        // Method used to subscribe a class into the DataChangeListener to do some action.
         dataChangeListeners.add(listener);
     }
 
     private Department getFormData() {
 
         Department obj = new Department();
-
         ValidationException exception = new ValidationException("Validation error");
 
-        obj.setId(Utils.tryParseToInt(txtId.getText()));
+        obj.setId(Utils.tryParseToInt(txtId.getText())); // Gets the Id from the form.
 
+        // Verifications to check if everything is ok.
         if (txtName.getText() == null || txtName.getText().trim().equals("")) {
             exception.addError("name", "Field cannot be empty");
         }
@@ -104,7 +106,7 @@ public class DepartmentFormController implements Initializable {
         if (exception.getErrors().size() > 0) {
             throw exception;
         }
-        obj.setName(txtName.getText());
+        obj.setName(txtName.getText()); // Gets the name from the form.
 
         return obj;
     }
