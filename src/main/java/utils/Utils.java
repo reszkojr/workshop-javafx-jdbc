@@ -8,7 +8,7 @@ public class Utils {
 
     public static Stage currentStage(ActionEvent event) {
 
-        // Gets the window that the event is in
+        // Gets the window that the event is in.
         return (Stage) ((Node) event.getSource()).getScene().getWindow();
     }
 

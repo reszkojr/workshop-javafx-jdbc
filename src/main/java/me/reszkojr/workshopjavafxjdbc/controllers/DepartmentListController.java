@@ -15,6 +15,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import me.reszkojr.workshopjavafxjdbc.Main;
+import me.reszkojr.workshopjavafxjdbc.db.DbIntegrityException;
 import me.reszkojr.workshopjavafxjdbc.listeners.DataChangeListener;
 import me.reszkojr.workshopjavafxjdbc.model.entities.Department;
 import me.reszkojr.workshopjavafxjdbc.model.services.DepartmentService;
@@ -24,6 +25,7 @@ import utils.Utils;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class DepartmentListController implements Initializable, DataChangeListener {
@@ -38,6 +40,9 @@ public class DepartmentListController implements Initializable, DataChangeListen
 
     @FXML
     private TableColumn<Department, Department> tableColumnEDIT;
+
+    @FXML
+    private TableColumn<Department, Department> tableColumnDELETE;
 
     @FXML
     private TableColumn<Department, String> tableColumnName;
@@ -83,6 +88,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
         obsList = FXCollections.observableArrayList(list);
         tableViewDepartment.setItems(obsList);
         initEditButtons();
+        initDeleteButtons();
     }
 
     // Creates a dialog form from the arguments
@@ -113,13 +119,33 @@ public class DepartmentListController implements Initializable, DataChangeListen
         }
     }
 
+    private void initDeleteButtons() {
+        tableColumnDELETE.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        tableColumnDELETE.setCellFactory(param -> new TableCell<Department, Department>() {
+
+            private final Button button = new Button("Delete");
+
+            protected void updateItem(Department obj, boolean empty) {
+                super.updateItem(obj, empty);
+
+                if (obj == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                setGraphic(button);
+                button.setOnAction(event -> removeEntity(obj));
+            }
+        });
+    }
+
     // Method that initiate the "Edit" buttons inside the "Edit" column.
     private void initEditButtons() {
 
         // Creates a CellValueFactory that is read-only.
         tableColumnEDIT.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
 
-        // Instantiate a CellFactory with modified atributes
+        // Instantiate a CellFactory with modified attributes.
         tableColumnEDIT.setCellFactory(param -> new TableCell<Department, Department>() {
 
             // Creates the "Edit" button
@@ -134,6 +160,7 @@ public class DepartmentListController implements Initializable, DataChangeListen
                     setGraphic(null);
                     return;
                 }
+
                 // Sets the button into the column
                 setGraphic(button);
 
@@ -142,6 +169,22 @@ public class DepartmentListController implements Initializable, DataChangeListen
             }
 
         });
+    }
+
+    private void removeEntity(Department obj) {
+        Optional<ButtonType> result = Alerts.showConfirmation("Confirmation", "Are you sure to delete?");
+
+        if (result.get() == ButtonType.OK) {
+            if (service == null) {
+                throw new IllegalStateException("Service was null");
+            }
+            try {
+                service.remove(obj);
+                updateTableView();
+            } catch (DbIntegrityException e) {
+                Alerts.showAlert("Error removing object", null, e.getMessage(), Alert.AlertType.ERROR);
+            }
+        }
     }
 
     @Override
