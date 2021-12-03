@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,12 +11,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import me.reszkojr.workshopjavafxjdbc.Main;
 import me.reszkojr.workshopjavafxjdbc.model.services.DepartmentService;
+import me.reszkojr.workshopjavafxjdbc.model.services.SellerService;
 import utils.Alerts;
 
 public class MainViewController implements Initializable {
@@ -33,8 +32,10 @@ public class MainViewController implements Initializable {
 
     @FXML
     public void onMenuItemSellerAction() {
-        System.out.println("onMenuItemSellerAction");
-    }
+        loadView("gui/SellerList.fxml", (SellerListController controller) -> {
+            controller.setSellerService(new SellerService());
+            controller.updateTableView();
+        });    }
 
     @FXML
     public void onMenuItemDepartmentAction() {
