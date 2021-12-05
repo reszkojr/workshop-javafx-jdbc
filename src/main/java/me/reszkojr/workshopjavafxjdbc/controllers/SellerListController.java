@@ -1,6 +1,8 @@
 package me.reszkojr.workshopjavafxjdbc.controllers;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -10,7 +12,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -18,6 +22,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import me.reszkojr.workshopjavafxjdbc.Main;
 import me.reszkojr.workshopjavafxjdbc.db.DbIntegrityException;
@@ -33,6 +39,15 @@ public class SellerListController implements Initializable, DataChangeListener {
 
     @FXML
     private TableView<Seller> tableViewSeller;
+
+    @FXML
+    private TableColumn<Seller, String> tableColumnEmail;
+
+    @FXML
+    private TableColumn<Seller, Date> tableColumnBirthDate;
+
+    @FXML
+    private TableColumn<Seller, Double> tableColumnBaseSalary;
 
     @FXML
     private TableColumn<Seller, Integer> tableColumnId;
@@ -71,9 +86,17 @@ public class SellerListController implements Initializable, DataChangeListener {
     private void initializeNodes() {
         tableColumnId.setCellValueFactory(new PropertyValueFactory<>("id"));
         tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        tableColumnDepartment.setCellValueFactory(new PropertyValueFactory<>("department"));
+        tableColumnEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        
+        tableColumnBirthDate.setCellValueFactory(new PropertyValueFactory<>("birthDate"));
+        Utils.formatTableColumnDate(tableColumnBirthDate, "dd/MM/yyyy");
 
+        tableColumnBaseSalary.setCellValueFactory(new PropertyValueFactory<>("baseSalary"));
+        Utils.formatTableColumnDouble(tableColumnBaseSalary, 2);
+
+        //tableColumnDepartment.setCellValueFactory(new PropertyValueFactory<>("department"));
         Stage stage = (Stage) Main.getMainScene().getWindow();
+
         // Makes the tableViewSeller the same height as the main scene
         tableViewSeller.prefHeightProperty().bind(stage.heightProperty());
     }
@@ -96,30 +119,30 @@ public class SellerListController implements Initializable, DataChangeListener {
 
     // Creates a dialog form from the arguments
     private void createDialogForm(Seller obj, String absoluteName, Stage parentStage) {
-        // try {
-        //     // Loads an FXML from absoluteName string
-        //     FXMLLoader loader = new FXMLLoader(Main.class.getResource(absoluteName));
-        //     Pane pane = loader.load();
+        try {
+            // Loads an FXML from absoluteName string
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource(absoluteName));
+            Pane pane = loader.load();
 
-        //     // Gets the SellerFormController from the loader
-        //     SellerFormController controller = loader.getController();
-        //     controller.setSeller(obj);  // Injects the dependency into it
-        //     controller.updateFormData();
-        //     controller.subscribeDataChangeListener(this); // Subscribes itself to receive a notification when the SellerFormController updates the database
-        //     controller.setSellerService(new SellerService());
+            // Gets the SellerFormController from the loader
+            SellerFormController controller = loader.getController();
+            controller.setSeller(obj);  // Injects the dependency into it
+            controller.updateFormData();
+            controller.subscribeDataChangeListener(this); // Subscribes itself to receive a notification when the SellerFormController updates the database
+            controller.setSellerService(new SellerService());
 
-        //     // Creates a dialog stage, where it will be the stage whose gonna receive the updates from the database
-        //     Stage dialogStage = new Stage();
-        //     dialogStage.setTitle("Enter Seller data:");
-        //     dialogStage.setScene(new Scene(pane));
-        //     dialogStage.setResizable(false);
-        //     dialogStage.initOwner(parentStage);
-        //     dialogStage.initModality(Modality.WINDOW_MODAL); // Makes the window modal, turning the main window unfocusable.
-        //     dialogStage.showAndWait();
+            // Creates a dialog stage, where it will be the stage whose gonna receive the updates from the database
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Enter Seller data:");
+            dialogStage.setScene(new Scene(pane));
+            dialogStage.setResizable(false);
+            dialogStage.initOwner(parentStage);
+            dialogStage.initModality(Modality.WINDOW_MODAL); // Makes the window modal, turning the main window unfocusable.
+            dialogStage.showAndWait();
 
-        // } catch (IOException e) {
-        //     Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), Alert.AlertType.ERROR);
-        // }
+        } catch (IOException e) {
+            Alerts.showAlert("IO Exception", "Error loading view", e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
 
     private void initDeleteButtons() {

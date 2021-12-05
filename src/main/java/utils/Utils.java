@@ -2,7 +2,12 @@ package utils;
 
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.stage.Stage;
+import java.util.Date;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
 
 public class Utils {
 
@@ -19,5 +24,48 @@ public class Utils {
         } catch (NumberFormatException e){
             return null;
         }
+    }
+
+    public static <T> void formatTableColumnDate(TableColumn<T, Date> tableColumn, String format) {
+        tableColumn.setCellFactory(column -> {
+            TableCell<T, Date> cell = new TableCell<T, Date>() {
+                private SimpleDateFormat sdf = new SimpleDateFormat(format);
+
+                @Override
+                protected void updateItem(Date item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                        return;
+                    }
+
+                    setText(sdf.format(item));
+                
+                }
+            };
+            return cell;
+        });
+    }
+    
+    public static <T> void formatTableColumnDouble(TableColumn<T, Double> tableColumn, int decimalPlaces) {
+        tableColumn.setCellFactory(column -> {
+            TableCell<T, Double> cell = new TableCell<>() {
+
+                @Override
+                protected void updateItem(Double item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                        return;
+                    }
+
+                    Locale.setDefault(Locale.US);
+                    setText(String.format("%." + decimalPlaces + "f", item));
+
+                }
+            };
+
+            return cell;
+        });
     }
 }
