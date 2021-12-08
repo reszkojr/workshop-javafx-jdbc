@@ -30,8 +30,8 @@ public class Utils {
             return null;
         }
     }
-
     public static <T> void formatTableColumnDate(TableColumn<T, Date> tableColumn, String format) {
+
         tableColumn.setCellFactory(column -> {
             TableCell<T, Date> cell = new TableCell<T, Date>() {
                 private SimpleDateFormat sdf = new SimpleDateFormat(format);

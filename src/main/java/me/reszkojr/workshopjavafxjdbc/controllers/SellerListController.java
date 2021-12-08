@@ -29,6 +29,7 @@ import me.reszkojr.workshopjavafxjdbc.Main;
 import me.reszkojr.workshopjavafxjdbc.db.DbIntegrityException;
 import me.reszkojr.workshopjavafxjdbc.listeners.DataChangeListener;
 import me.reszkojr.workshopjavafxjdbc.model.entities.Seller;
+import me.reszkojr.workshopjavafxjdbc.model.services.DepartmentService;
 import me.reszkojr.workshopjavafxjdbc.model.services.SellerService;
 import utils.Alerts;
 import utils.Utils;
@@ -127,9 +128,10 @@ public class SellerListController implements Initializable, DataChangeListener {
             // Gets the SellerFormController from the loader
             SellerFormController controller = loader.getController();
             controller.setSeller(obj);  // Injects the dependency into it
-            controller.updateFormData();
+            controller.setServices(new SellerService(), new DepartmentService());
+            controller.loadAssociatedObjects();
             controller.subscribeDataChangeListener(this); // Subscribes itself to receive a notification when the SellerFormController updates the database
-            controller.setSellerService(new SellerService());
+            controller.updateFormData();
 
             // Creates a dialog stage, where it will be the stage whose gonna receive the updates from the database
             Stage dialogStage = new Stage();
